@@ -1,19 +1,132 @@
-<?php
-header("Content-type:text/html;charset=utf-8");
-header("Access-Control-Allow-Origin:*");
-error_reporting(0);
-ini_set('display_errors', false);
-ini_set('display_startup_errors', false);
-$a  = isset($_REQUEST['a']) ? trim($_REQUEST['a']) : 'default';
-if($a=="s")
-{
-	echo file_get_contents('data/'.$_REQUEST["n"].'.json');
-	return;
+<?
+class jdb{
+    public static function query($f=[]){
+        if(!file_exists("data.json")){
+            file_put_contents('data.json', "[]");
+        }
+        $s = file_get_contents('data.json');
+        $arr = json_decode($s,true);
+        $re =[];
+        if(empty($f)){
+            $re=$arr;
+        }else{
+            foreach ($arr as $vv){
+                $ok=false;
+                foreach($f as $k=>$v)
+                {
+                       $ok=($vv[$k]==$v);
+                }
+                if($ok){ $re[]=$vv; }
+            }
+        }
+      
+        return $re;
+    }
+    
+    public static function find($f=[]){
+        if(!file_exists("data.json")){
+            file_put_contents('data.json', "[]");
+        }
+        $s = file_get_contents('data.json');
+        $arr = json_decode($s,true);
+        $re =[];
+        if(empty($f)){
+            $re=$arr[0];
+        }else{
+            foreach ($arr as $vv){
+                $ok=false;
+                foreach($f as $k=>$v)
+                {
+                       $ok=($vv[$k]==$v);
+                }
+                if($ok){ $re[]=$vv; break;}
+            }
+        }
+      
+        return $re[0];
+    }
+    
+    public static function one($key,$f=[]){
+        if(!file_exists("data.json")){
+            file_put_contents('data.json', "[]");
+        }
+        $s = file_get_contents('data.json');
+        $arr = json_decode($s,true);
+        $re =[];
+        if(empty($f)){
+            $re=$arr[0];
+        }else{
+            foreach ($arr as $vv){
+                $ok=false;
+                foreach($f as $k=>$v)
+                {
+                       $ok=($vv[$k]==$v);
+                }
+                if($ok){ $re[]=$vv; break; }
+            }
+        }
+      
+        return $re[0][$key];
+    }
+    
+    public static function add($m){
+         if(!file_exists("data.json")){
+            file_put_contents('data.json', "[]");
+        }
+         $s = file_get_contents('data.json');
+         $arr = json_decode($s,true);
+         $arr[]=$m;
+         file_put_contents('data.json', json_encode($arr,256));
+         return "ok";
+    }
+    
+     public static function edit($m,$f=[]){
+        if(!file_exists("data.json")){
+            file_put_contents('data.json', "[]");
+        }
+        $s = file_get_contents('data.json');
+        $arr = json_decode($s,true);
+        if(!empty($f)){
+            foreach ($arr as $kk=>&$vv){
+                $ok=false;
+                foreach($f as $k=>$v)
+                {
+                       $ok=($vv[$k]==$v);
+                }
+                if($ok){ 
+                    foreach($m as $mk=>$mv)
+                    {
+                        $arr[$kk][$mk]=$mv;
+                    }
+                }
+            }
+        }
+        file_put_contents('data.json', json_encode($arr,256));
+        return "ok";
+    }
+    
+    public static function del($f=[]){
+        if(!file_exists("data.json")){
+            file_put_contents('data.json', "[]");
+        }
+        $s = file_get_contents('data.json');
+        $arr = json_decode($s,true);
+        if(!empty($f)){
+            foreach ($arr as $kk=>&$vv){
+                $ok=false;
+                foreach($f as $k=>$v)
+                {
+                       $ok=($vv[$k]==$v);
+                }
+                if($ok){ 
+                  unset($arr[$kk]);
+                }
+            }
+        }
+        file_put_contents('data.json', json_encode($arr,256));
+        return "ok";
+    }
 }
-elseif($a=="e") 
-{
-	file_put_contents('data/'.$_REQUEST["n"].'.json',$_REQUEST["d"]);
-	echo "ok";
-	return;
-}
+
+
 ?>
